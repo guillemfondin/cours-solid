@@ -3,6 +3,10 @@
 namespace App\Controller;
 
 use App\Reporting\Report;
+use App\Reporting\StringReport;
+use App\Reporting\Format\CsvFormatter;
+use App\Reporting\Format\HtmlFormatter;
+use App\Reporting\Format\JsonFormatter;
 
 class ReportCreatorController
 {
@@ -20,12 +24,17 @@ class ReportCreatorController
         $format = $_POST['format'];
 
         // Début de l'algorithme
-        $report = new Report($date, $title, $data);
+        $report = new StringReport($date, $title, $data);
+
+        $reportCsv = new CsvFormatter();
+        // dd($reportCsv->formatToCsv($report));
 
         if ($format === "html") {
-            $reportResult = $report->formatToHTML();
+            $formatter = new HtmlFormatter();
+            $reportResult = $formatter->serialize($report);
         } else {
-            $reportResult = $report->formatToJSON();
+            $formatter = new JsonFormatter();
+            $reportResult = $formatter->serialize($report);
         }
 
         require_once(TEMPLATES_DIR . 'report-creator/result.html.php');
